@@ -1,11 +1,7 @@
 [tool.poetry]
 name = "hexlet-code"
 version = "0.1.0"
-<<<<<<< HEAD
 description = "page source code analyzer proj"
-=======
-description = "page source code analyzer"
->>>>>>> 7a6714e1fffa2ca12261d9140f50836f4951b41c
 authors = ["sanswed <sanswed@gmail.com>"]
 repository = "https://github.com/ConstableFraser/python-project-83"
 packages = [
