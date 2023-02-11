@@ -3,6 +3,7 @@ name = "hexlet-code"
 version = "0.1.0"
 description = "page source code analyzer"
 authors = ["sanswed <sanswed@gmail.com>"]
+repository = "https://github.com/ConstableFraser/python-project-83"
 packages = [
   { include = "page_analyzer" },
   ]
