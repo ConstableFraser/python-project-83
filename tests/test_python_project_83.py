@@ -1,4 +1,4 @@
-from python_project_83 import __version__
+from page_analyzer import __version__
 
 
 def test_version():
