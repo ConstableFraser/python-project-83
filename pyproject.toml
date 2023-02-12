@@ -3,16 +3,18 @@ name = "hexlet-code"
 version = "0.1.0"
 description = "page source code analyzer proj"
 authors = ["sanswed <sanswed@gmail.com>"]
-repository = "https://github.com/ConstableFraser/python-project-83"
+Brepository = "https://github.com/ConstableFraser/python-project-83"
 packages = [
   { include = "page_analyzer" },
-  ]
+]
 
 [tool.poetry.dependencies]
 python = "^3.8"
 
 [tool.poetry.dev-dependencies]
-pytest = "^5.2"
+flake8 = "^5.0.4"
+pytest = "^7.1.3"
+gunicorn = "^20.0.4"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
