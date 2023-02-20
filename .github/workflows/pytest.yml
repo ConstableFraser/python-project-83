@@ -13,7 +13,7 @@ jobs:
         image: postgres:latest
         # Provide the password for postgres
         env:
-          PASSWORD: ${{ secrets.PASSWORD }}
+          POSTGRES_PASSWORD: ${{ secrets.PASSWORD }}
         # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
