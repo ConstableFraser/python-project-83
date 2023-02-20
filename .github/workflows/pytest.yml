@@ -21,9 +21,9 @@ jobs:
         uses: paambaati/codeclimate-action@v3.0.0
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
-          DBNAME: ${{ DBNAME }}
-          USER: ${{ USER }}
-          HOST: ${{ HOST }}
+          DBNAME: ${{ vars.DBNAME }}
+          USER: ${{ vars.USER }}
+          HOST: ${{ vars.HOST }}
           PASSWORD: ${{ secrets.PASSWORD }}
           SECRETKEY: ${{ secrets.SECRETKEY }}
         with:
