@@ -21,11 +21,11 @@ jobs:
         uses: paambaati/codeclimate-action@v3.0.0
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
-          DBNAME: ${{ variables.DBNAME }}
-          USER: ${{ variables.USER }}
-          HOST: ${{ variables.HOST }}
-          PASSWORD: ${{ variables.PASSWORD }}
-          SECRETKEY: ${{ variables.SECRETKEY }}
+          DBNAME: ${{ DBNAME }}
+          USER: ${{ USER }}
+          HOST: ${{ HOST }}
+          PASSWORD: ${{ secrets.PASSWORD }}
+          SECRETKEY: ${{ secrets.SECRETKEY }}
         with:
           coverageCommand: make test-coverage-xml
           debug: true
