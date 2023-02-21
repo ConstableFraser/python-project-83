@@ -2,10 +2,13 @@ import os
 import psycopg2
 from validators.url import url
 from urllib.parse import urlparse
+from dotenv import load_dotenv, find_dotenv
 from flask import (Flask, render_template, request, redirect,
                    url_for, flash, get_flashed_messages)
 
 app = Flask(__name__)
+
+load_dotenv(find_dotenv())
 
 app.secret_key = os.environ.get("SECRETKEY")
 
@@ -13,6 +16,8 @@ dbname = os.environ.get("DBNAME")
 user = os.environ.get("USER")
 password = os.environ.get("PASSWORD")
 host = os.environ.get("HOST")
+print("*****user******", user)
+print("*****password******", password)
 conn = psycopg2.connect(dbname=dbname,
                         user=user,
                         password=password,
