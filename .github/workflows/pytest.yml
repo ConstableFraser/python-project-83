@@ -38,8 +38,8 @@ jobs:
         uses: paambaati/codeclimate-action@v3.0.0
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
-          DBNAME: ${{ vars.DBNAME }}
-          USER: ${{ vars.USER }}
+          DBNAME: postgres
+          USER: postgres
           HOST: ${{ vars.HOST }}
           PASSWORD: postgres
           SECRETKEY: ${{ secrets.SECRETKEY }}
