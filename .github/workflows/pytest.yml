@@ -13,7 +13,7 @@ jobs:
         image: postgres:latest
         # Provide the password for postgres
         env:
-          POSTGRES_PASSWORD: ${{ secrets.PASSWORD }}
+          POSTGRES_PASSWORD: postgres
         # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
@@ -38,10 +38,10 @@ jobs:
         uses: paambaati/codeclimate-action@v3.0.0
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
-          DBNAME: ${{ vars.DBNAME }}
-          USER: ${{ vars.USER }}
-          HOST: ${{ vars.HOST }}
-          PASSWORD: ${{ secrets.PASSWORD }}
+          USER: postgres
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+          PASSWORD: postgres
           SECRETKEY: ${{ secrets.SECRETKEY }}
         with:
           coverageCommand: make test-coverage-xml
