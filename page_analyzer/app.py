@@ -24,6 +24,12 @@ conn = psycopg2.connect(dbname=dbname,
                         host=host)
 cur = conn.cursor()
 
+cur.execute("DROP TABLE IF EXISTS urls")
+cur.execute("CREATE TABLE urls( \
+             id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY, \
+             name varchar(255) UNIQUE NOT NULL, \
+             created_at timestamp)")
+
 
 @app.route('/', methods=['GET'])
 def start():
@@ -52,9 +58,10 @@ def add():
         timestamp = cur.fetchall()
         cur.execute("SELECT MAX(id)+1 FROM urls")
         max_id = cur.fetchall()
-        cur.execute("INSERT INTO urls (id, name, created_at) VALUES \
-                    ((%s), (%s), (%s))",
-                    (max_id[0][0], link, timestamp[0][0]))
+        cur.execute("INSERT INTO urls \
+                    (name, created_at) \
+                    VALUES ((%s), (%s))",
+                    (link, timestamp[0][0]))
         conn.commit()
         flash('Страница успешно добавлена', 'success')
         return redirect(url_for('site', id=max_id[0][0]), code=302)
