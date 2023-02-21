@@ -29,6 +29,7 @@ cur.execute("CREATE TABLE urls( \
              id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY, \
              name varchar(255) UNIQUE NOT NULL, \
              created_at timestamp)")
+conn.commit()
 
 
 @app.route('/', methods=['GET'])
@@ -56,13 +57,13 @@ def add():
             return redirect(url_for('site', id=records[0][0]), code=302)
         cur.execute("SELECT CURRENT_TIMESTAMP")
         timestamp = cur.fetchall()
-        cur.execute("SELECT MAX(id)+1 FROM urls")
-        max_id = cur.fetchall()
         cur.execute("INSERT INTO urls \
                     (name, created_at) \
                     VALUES ((%s), (%s))",
                     (link, timestamp[0][0]))
         conn.commit()
+        cur.execute("SELECT MAX(id) FROM urls")
+        max_id = cur.fetchall()
         flash('Страница успешно добавлена', 'success')
         return redirect(url_for('site', id=max_id[0][0]), code=302)
     elif request.method == 'GET':
