@@ -13,7 +13,7 @@ jobs:
         image: postgres:latest
         # Provide the password for postgres
         env:
-          POSTGRES_PASSWORD: ${{ secrets.PASSWORD }}
+          POSTGRES_PASSWORD: postgres
         # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
@@ -41,7 +41,7 @@ jobs:
           DBNAME: ${{ vars.DBNAME }}
           USER: ${{ vars.USER }}
           HOST: ${{ vars.HOST }}
-          PASSWORD: ${{ secrets.PASSWORD }}
+          PASSWORD: postgres
           SECRETKEY: ${{ secrets.SECRETKEY }}
         with:
           coverageCommand: make test-coverage-xml
