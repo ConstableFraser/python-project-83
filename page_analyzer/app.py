@@ -1,5 +1,7 @@
 import os
+import time
 import psycopg2
+from datetime import datetime
 from validators.url import url
 from urllib.parse import urlparse
 from dotenv import load_dotenv, find_dotenv
@@ -22,11 +24,22 @@ conn = psycopg2.connect(dbname=dbname,
                         host=host)
 cur = conn.cursor()
 
+cur.execute("DROP TABLE IF EXISTS url_checks")
 cur.execute("DROP TABLE IF EXISTS urls")
+
 cur.execute("CREATE TABLE urls( \
              id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY, \
              name varchar(255) UNIQUE NOT NULL, \
-             created_at timestamp)")
+             created_at float)")
+
+cur.execute("CREATE TABLE url_checks( \
+             id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY, \
+             url_id bigint REFERENCES urls (id), \
+             status_code integer, \
+             h1 text, \
+             title varchar(255), \
+             description text, \
+             created_at float);")
 conn.commit()
 
 
@@ -53,19 +66,21 @@ def add():
         if records:
             flash('Страница уже существует', 'info')
             return redirect(url_for('site', id=records[0][0]), code=302)
-        cur.execute("SELECT CURRENT_TIMESTAMP")
-        timestamp = cur.fetchall()
+
         cur.execute("INSERT INTO urls \
                     (name, created_at) \
                     VALUES ((%s), (%s))",
-                    (link, timestamp[0][0]))
+                    (link, time.time()))
         conn.commit()
         cur.execute("SELECT MAX(id) FROM urls")
         max_id = cur.fetchall()
         flash('Страница успешно добавлена', 'success')
         return redirect(url_for('site', id=max_id[0][0]), code=302)
     elif request.method == 'GET':
-        cur.execute("SELECT id, name, created_at FROM urls ORDER BY id DESC")
+        cur.execute("SELECT urls.id, name, MAX(url_checks.created_at) \
+                     FROM urls LEFT JOIN url_checks ON \
+                     urls.id = url_checks.url_id \
+                     GROUP BY urls.id ORDER BY urls.id DESC")
         records = cur.fetchall()
         messages = get_flashed_messages(with_categories=True)
         return render_template('urls.html', messages=messages, rows=records)
@@ -84,10 +99,36 @@ def site(id):
                                site_name='<error>')
     site_name = records[0][0]
     cur.execute("SELECT id, name, created_at FROM urls WHERE id = (%s)", (id,))
-    records = cur.fetchall()
+    record = cur.fetchall()
+
+    cur.execute("SELECT id, created_at FROM \
+                 url_checks WHERE url_id = (%s) \
+                 ORDER BY id DESC", (id,))
+    checks = cur.fetchall()
 
     messages = get_flashed_messages(with_categories=True)
     return render_template('url_id.html',
                            messages=messages,
                            site_name=site_name,
-                           record=records[0])
+                           id=id,
+                           checks=checks,
+                           record=record[0])
+
+
+@app.post('/urls/<id>/checks')
+def check(id):
+    cur.execute("INSERT INTO url_checks \
+                (url_id, created_at) \
+                VALUES ((%s), (%s))",
+                (id, time.time()))
+    conn.commit()
+
+    return redirect(url_for('site', id=id), code=302)
+
+
+@app.template_filter('ctime')
+def timectime(s):
+    if s is not None:
+        return datetime.date(datetime.fromtimestamp(s))
+    else:
+        return ""

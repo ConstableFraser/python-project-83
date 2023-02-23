@@ -48,19 +48,19 @@
         </tr>
         <tr>
           <td>Дата создания</td>
-          <td>{{ record[2] }}</td>
+          <td>{{ record[2] | ctime }}</td>
         </tr>
       </tbody>
     </table>
   </div>
 
     <h2 class="mt-5 mb-3">Проверки</h2>
-    <form method="post" action="/urls/1/checks">
+    <form method="post" action="/urls/{{ id }}/checks">
     <input type="submit" class="btn btn-primary" value="Запустить проверку">
     </form>
     
   <div>
-    <table class="table table-bordered table-hover mt-2" data-test="checks">
+    <table class="table table-bordered table-hover mt-2" data-test="urls">
       <tbody>
 	<thead>
     <tr>
@@ -72,6 +72,16 @@
         <th>Дата создания</th>
     </tr>
     	</thead>
+        {% for check in checks %}
+        <tr>
+            <td> {{ check[0] }} </td>
+            <td> -//-//- </td>
+            <td> -//-//- </td>
+            <td> -//-//- </td>
+            <td> -//-//- </td>
+            <td> {{ check[1] | ctime }} </td>
+        </tr>
+        {% endfor %}    	
       </tbody>
     </table>
   </div>
