@@ -1,6 +1,7 @@
 import os
 import time
 import psycopg2
+import requests
 from datetime import datetime
 from validators.url import url
 from urllib.parse import urlparse
@@ -58,6 +59,7 @@ def add():
         netloc = address[1]
         path = address[2]
         link = scheme + netloc + path
+
         if len(link) > 255 or not url(link):
             flash('Некорректный URL', 'danger')
             return redirect(url_for('start'), code=302)
@@ -76,11 +78,15 @@ def add():
         max_id = cur.fetchall()
         flash('Страница успешно добавлена', 'success')
         return redirect(url_for('site', id=max_id[0][0]), code=302)
+
     elif request.method == 'GET':
-        cur.execute("SELECT urls.id, name, MAX(url_checks.created_at) \
-                     FROM urls LEFT JOIN url_checks ON \
-                     urls.id = url_checks.url_id \
-                     GROUP BY urls.id ORDER BY urls.id DESC")
+        cur.execute("SELECT urls.id, urls.name, url_checks.created_at, \
+                    url_checks.status_code FROM urls LEFT JOIN url_checks ON \
+                    urls.id = url_checks.url_id WHERE \
+                    (url_checks.id IS NULL OR url_checks.id IN \
+                    (SELECT id FROM url_checks WHERE created_at IN \
+                    (SELECT MAX(created_at) FROM url_checks GROUP BY \
+                    url_id))) ORDER BY urls.id DESC")
         records = cur.fetchall()
         messages = get_flashed_messages(with_categories=True)
         return render_template('urls.html', messages=messages, rows=records)
@@ -101,7 +107,7 @@ def site(id):
     cur.execute("SELECT id, name, created_at FROM urls WHERE id = (%s)", (id,))
     record = cur.fetchall()
 
-    cur.execute("SELECT id, created_at FROM \
+    cur.execute("SELECT id, status_code, created_at FROM \
                  url_checks WHERE url_id = (%s) \
                  ORDER BY id DESC", (id,))
     checks = cur.fetchall()
@@ -117,10 +123,26 @@ def site(id):
 
 @app.post('/urls/<id>/checks')
 def check(id):
+    cur.execute("SELECT name FROM urls WHERE id = (%s)", (id,))
+    records = cur.fetchall()
+    url = records[0][0]
+
+    headers = requests.utils.default_headers()
+    headers.update({'User-Agent': 'My User Agent 1.0'})
+
+    try:
+        response = requests.get(url, headers=headers)
+    except requests.ConnectionError as e:
+        flash('Произошла ошибка про проверке', 'danger')
+        print(e)
+        return redirect(url_for('site', id=id), code=302)
+
+    status_code = response.status_code
+
     cur.execute("INSERT INTO url_checks \
-                (url_id, created_at) \
-                VALUES ((%s), (%s))",
-                (id, time.time()))
+                (url_id, status_code, created_at) \
+                VALUES ((%s), (%s), (%s))",
+                (id, status_code, time.time()))
     conn.commit()
 
     return redirect(url_for('site', id=id), code=302)

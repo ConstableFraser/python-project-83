@@ -42,7 +42,7 @@
     <tbody>
 	<thead>
       		<tr>
-		    <th>ID</th>
+	        <th>ID</th>
 	        <th>Имя</th>
 	        <th>Последняя проверка</th>
 	        <th>Код ответа</th>
@@ -53,7 +53,7 @@
           <td>{{ row[0] }}</td>
           <td>{{ row[1] }}</td>          
           <td>{{ row[2] | ctime }}</td>
-          <td></td>
+          <td>{% if row[3] %} {{ row[3] }} {% else %} {% endif %}</td>
         </tr>
         {% endfor %}
     </tbody>
