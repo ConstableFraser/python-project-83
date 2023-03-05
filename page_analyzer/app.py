@@ -5,7 +5,9 @@ import requests
 from datetime import datetime
 from validators.url import url
 from urllib.parse import urlparse
+from page_analyzer.init_db import init_db
 from dotenv import load_dotenv, find_dotenv
+from page_analyzer.find_value_html import get_value
 from flask import (Flask, render_template, request, redirect,
                    url_for, flash, get_flashed_messages)
 
@@ -23,25 +25,8 @@ conn = psycopg2.connect(dbname=dbname,
                         user=user,
                         password=password,
                         host=host)
-cur = conn.cursor()
 
-cur.execute("DROP TABLE IF EXISTS url_checks")
-cur.execute("DROP TABLE IF EXISTS urls")
-
-cur.execute("CREATE TABLE urls( \
-             id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY, \
-             name varchar(255) UNIQUE NOT NULL, \
-             created_at float)")
-
-cur.execute("CREATE TABLE url_checks( \
-             id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY, \
-             url_id bigint REFERENCES urls (id), \
-             status_code integer, \
-             h1 text, \
-             title varchar(255), \
-             description text, \
-             created_at float);")
-conn.commit()
+init_db(conn.cursor(), conn)
 
 
 @app.route('/', methods=['GET'])
@@ -59,12 +44,16 @@ def add():
         netloc = address[1]
         path = address[2]
         link = scheme + netloc + path
+        cur = conn.cursor()
 
         if len(link) > 255 or not url(link):
             flash('Некорректный URL', 'danger')
+            cur.close()
             return redirect(url_for('start'), code=302)
+
         cur.execute("SELECT id FROM urls WHERE name = (%s)", (link,))
         records = cur.fetchall()
+
         if records:
             flash('Страница уже существует', 'info')
             return redirect(url_for('site', id=records[0][0]), code=302)
@@ -77,9 +66,11 @@ def add():
         cur.execute("SELECT MAX(id) FROM urls")
         max_id = cur.fetchall()
         flash('Страница успешно добавлена', 'success')
+        cur.close()
         return redirect(url_for('site', id=max_id[0][0]), code=302)
 
     elif request.method == 'GET':
+        cur = conn.cursor()
         cur.execute("SELECT urls.id, urls.name, url_checks.created_at, \
                     url_checks.status_code FROM urls LEFT JOIN url_checks ON \
                     urls.id = url_checks.url_id WHERE \
@@ -89,30 +80,35 @@ def add():
                     url_id))) ORDER BY urls.id DESC")
         records = cur.fetchall()
         messages = get_flashed_messages(with_categories=True)
-        return render_template('urls.html', messages=messages, rows=records)
+        cur.close()
+        return render_template('urls.html', messages=messages,
+                               rows=records), 200
 
 
 @app.route('/urls/<id>', methods=['GET'])
 def site(id):
+    cur = conn.cursor()
+    id = int(id) if id.isdigit() else None
     cur.execute("SELECT name FROM urls WHERE id = (%s)", (id,))
     records = cur.fetchall()
 
     if not records:
         flash('Такой страницы не существует', 'danger')
         messages = get_flashed_messages(with_categories=True)
-        return render_template('url_id.html',
-                               messages=messages,
-                               site_name='<error>')
+        cur.close()
+        return render_template('404.html', messages=messages), 404
+
     site_name = records[0][0]
     cur.execute("SELECT id, name, created_at FROM urls WHERE id = (%s)", (id,))
     record = cur.fetchall()
 
-    cur.execute("SELECT id, status_code, created_at FROM \
-                 url_checks WHERE url_id = (%s) \
+    cur.execute("SELECT id, status_code, h1, title, description, created_at \
+                 FROM url_checks WHERE url_id = (%s) \
                  ORDER BY id DESC", (id,))
     checks = cur.fetchall()
 
     messages = get_flashed_messages(with_categories=True)
+    cur.close()
     return render_template('url_id.html',
                            messages=messages,
                            site_name=site_name,
@@ -123,6 +119,7 @@ def site(id):
 
 @app.post('/urls/<id>/checks')
 def check(id):
+    cur = conn.cursor()
     cur.execute("SELECT name FROM urls WHERE id = (%s)", (id,))
     records = cur.fetchall()
     url = records[0][0]
@@ -135,22 +132,34 @@ def check(id):
     except requests.ConnectionError as e:
         flash('Произошла ошибка про проверке', 'danger')
         print(e)
+        cur.close()
         return redirect(url_for('site', id=id), code=302)
 
     status_code = response.status_code
 
+    h1 = get_value(response.text, 'h1')
+    title = get_value(response.text, 'title')
+    content = get_value(response.text, 'content')
+
     cur.execute("INSERT INTO url_checks \
-                (url_id, status_code, created_at) \
-                VALUES ((%s), (%s), (%s))",
-                (id, status_code, time.time()))
+                (url_id, status_code, h1, title, description, created_at) \
+                VALUES (%s, %s, %s, %s, %s, %s)",
+                (id, status_code, h1, title, content, time.time()))
     conn.commit()
+    cur.close()
 
     return redirect(url_for('site', id=id), code=302)
 
 
-@app.template_filter('ctime')
-def timectime(s):
-    if s is not None:
-        return datetime.date(datetime.fromtimestamp(s))
+@app.template_filter('date')
+def timectime(timestamp):
+    if timestamp is not None:
+        return datetime.date(datetime.fromtimestamp(timestamp))
     else:
         return ""
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    messages = get_flashed_messages(with_categories=True)
+    return render_template('404.html', messages=messages), 404

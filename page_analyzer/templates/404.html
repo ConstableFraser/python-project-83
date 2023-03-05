@@ -33,63 +33,16 @@
 </header>
 
   <main class="flex-grow-1">
-    <div class="container-lg mt-3">
-      <h1>Сайт: {{ site_name }}</h1>    
-  <div class="table-responsive">
-    <table class="table table-bordered table-hover text-nowrap" data-test="url">
-      <tbody>
-        <tr>
-          <td>ID</td>
-          <td>{{ record[0] }}</td>
-        </tr>
-        <tr>
-          <td>Имя</td>
-          <td>{{ record[1] }}</td>
-        </tr>
-        <tr>
-          <td>Дата создания</td>
-          <td>{{ record[2] | date }}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-    <h2 class="mt-5 mb-3">Проверки</h2>
-    <form method="post" action="/urls/{{ id }}/checks">
-    <input type="submit" class="btn btn-primary" value="Запустить проверку">
-    </form>
-    
-  <div>
-    <table class="table table-bordered table-hover mt-2" data-test="urls">
-      <tbody>
-	<thead style="vertical-align:top">
-    <tr>
-        <th>ID</th>
-        <th>Код ответа</th>
-        <th>h1</th>
-        <th>title</th>
-        <th>description</th>
-        <th>Дата создания</th>
-    </tr>
-    	</thead>
-        {% for check in checks %}
-        <tr>
-            <td> {{ check[0] }} </td>
-            <td> {{ check[1] }} </td>
-            <td> {{ check[2] }}  </td>
-            <td> {{ check[3] }} </td>
-            <td> {{ check[4] }} </td>
-            <td> {{ check[5] | date }} </td>
-        </tr>
-        {% endfor %}    	
-      </tbody>
-    </table>
-  </div>
-
-    </div>
+      <div class="container-lg mt-3">
+        <h1>Страница не найдена</h1>
+        <div>
+            <p>Здесь нет того, что вы ищете.</p>
+            <a href="{{ url_for("start") }}">Вернуться на главную</a>
+        </div>
+      </div>
   </main>
 
-  <footer class="border-top py-3 mt-5 flex-shrink-0 fixed-bottom bg-white">
+  <footer class="border-top py-3 mt-5 flex-shrink-0 fixed-bottom">
     <div class="container-lg">
         <div class="text-center">
               <a href="https://ru.hexlet.io/" target="_blank">Hexlet</a>
