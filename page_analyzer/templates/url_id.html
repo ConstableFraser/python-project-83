@@ -75,10 +75,10 @@
         {% for check in checks %}
         <tr>
             <td> {{ check[0] }} </td>
-            <td> {{ check[1] }} </td>
-            <td> {{ check[2] }}  </td>
-            <td> {{ check[3] }} </td>
-            <td> {{ check[4] }} </td>
+            <td> {% if check[1] %} {{ check[1] }} {% else %} {% endif %} </td>
+            <td> {% if check[2] %} {{ check[2] }} {% else %} {% endif %} </td>
+            <td> {% if check[3] %} {{ check[3] }} {% else %} {% endif %} </td>
+            <td> {% if check[4] %} {{ check[4] }} {% else %} {% endif %} </td>
             <td> {{ check[5] | date }} </td>
         </tr>
         {% endfor %}    	
