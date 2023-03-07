@@ -1,5 +1,7 @@
 import pytest
 from page_analyzer.app import app
+from page_analyzer.find_value_html import get_value
+from page_analyzer.get_content import get_content
 
 
 @pytest.fixture()
@@ -42,3 +44,43 @@ def tests_correct_url(client):
 
     response = client.get('/urls/23452145124351')
     assert response.status_code == 404
+
+
+@pytest.mark.parametrize(
+    "tag, html, correct",
+    [("h1",
+      "tests/fixtures/correct/ramokna_ru.html",
+      "tests/fixtures/correct/ramokna_h1.txt"),
+     ("title",
+      "tests/fixtures/correct/ramokna_ru.html",
+      "tests/fixtures/correct/ramokna_title.txt"),
+     ("content",
+      "tests/fixtures/correct/ramokna_ru.html",
+      "tests/fixtures/correct/ramokna_description.txt")])
+def test_correct(tag, html, correct):
+    value = get_value(get_content(html), tag)
+    assert get_content(correct) == value
+
+
+@pytest.mark.parametrize(
+    "tag, html, correct",
+    [pytest.param("h1",
+                  "tests/fixtures/uncorrect/ru_hexlet_io.html",
+                  None,
+                  marks=pytest.mark.xfail),
+     pytest.param("title",
+                  "tests/fixtures/uncorrect/ya_ru.html",
+                  "",
+                  marks=pytest.mark.xfail),
+     pytest.param("content",
+                  "tests/fixtures/uncorrect/ozon_ru.html",
+                  "",
+                  marks=pytest.mark.xfail)])
+def test_fails(tag, html, correct):
+    value = get_value(get_content(html), tag)
+    assert correct == value
+
+
+def test_get_content():
+    value = open("tests/fixtures/example_txt_file.txt", "r").read()
+    assert "this is a text file" == value
