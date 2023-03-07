@@ -13,6 +13,7 @@ from flask import (Flask, render_template, request, redirect,
 
 app = Flask(__name__)
 
+print("FIND_DOTENV()", find_dotenv())
 load_dotenv(find_dotenv())
 
 app.secret_key = os.environ.get("SECRETKEY")
