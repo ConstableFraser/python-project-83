@@ -13,20 +13,23 @@ from flask import (Flask, render_template, request, redirect,
 
 app = Flask(__name__)
 
-# print("==============FIND_DOTENV()===============", find_dotenv())
 # load_dotenv(find_dotenv())
 
 app.secret_key = os.environ.get("SECRETKEY")
 
-dbname = os.environ.get("DBNAME")
-user = os.environ.get("USER")
-password = os.environ.get("PASSWORD")
-host = os.environ.get("HOST")
+dbname = os.getenv("DBNAME")
+user = os.getenv("USER")
+password = os.getenv("PASSWORD")
+host = os.getenv("HOST")
+# dbname = os.environ.get("DBNAME")
+# user = os.environ.get("USER")
+# password = os.environ.get("PASSWORD")
+# host = os.environ.get("HOST")
 print("DBNAME:", dbname)
 print("USER:", user)
 print("PASSWORD:", password)
 print("HOST:", host)
-print("==============LOAD_DOTENV()===============", load_dotenv())
+# print("==============LOAD_DOTENV()===============", load_dotenv())
 
 conn = psycopg2.connect(dbname=dbname,
                         user=user,
