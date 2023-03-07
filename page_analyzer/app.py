@@ -35,54 +35,53 @@ def start():
     return render_template('index.html', messages=messages)
 
 
-@app.route('/urls', methods=['GET', 'POST'])
+@app.route('/urls', methods=['GET'])
+def sites():
+    cur = conn.cursor()
+    cur.execute("SELECT urls.id, urls.name, url_checks.created_at, \
+                url_checks.status_code FROM urls LEFT JOIN url_checks ON \
+                urls.id = url_checks.url_id WHERE \
+                (url_checks.id IS NULL OR url_checks.id IN \
+                (SELECT id FROM url_checks WHERE created_at IN \
+                (SELECT MAX(created_at) FROM url_checks GROUP BY \
+                url_id))) ORDER BY urls.id DESC")
+    records = cur.fetchall()
+    messages = get_flashed_messages(with_categories=True)
+    cur.close()
+    return render_template('urls.html', messages=messages,
+                           rows=records), 200
+
+
+@app.post('/urls')
 def add():
-    if request.method == 'POST':
-        address = urlparse(request.form.get('url'))
-        scheme = address[0] if address[0] else 'http'
-        scheme += '://'
-        netloc = address[1]
-        path = address[2]
-        link = scheme + netloc + path
-        cur = conn.cursor()
-
-        if len(link) > 255 or not url(link):
-            flash('Некорректный URL', 'danger')
-            cur.close()
-            return redirect(url_for('start'), code=302)
-
-        cur.execute("SELECT id FROM urls WHERE name = (%s)", (link,))
-        records = cur.fetchall()
-
-        if records:
-            flash('Страница уже существует', 'info')
-            return redirect(url_for('site', id=records[0][0]), code=302)
-
-        cur.execute("INSERT INTO urls \
-                    (name, created_at) \
-                    VALUES ((%s), (%s))",
-                    (link, time.time()))
-        conn.commit()
-        cur.execute("SELECT MAX(id) FROM urls")
-        max_id = cur.fetchall()
-        flash('Страница успешно добавлена', 'success')
+    address = urlparse(request.form.get('url'))
+    scheme = address[0] if address[0] else 'http'
+    scheme += '://'
+    netloc = address[1]
+    path = address[2]
+    link = scheme + netloc + path
+    cur = conn.cursor()
+    if len(link) > 255 or not url(link):
+        flash('Некорректный URL', 'danger')
         cur.close()
-        return redirect(url_for('site', id=max_id[0][0]), code=302)
+        return redirect(url_for('start'), code=302)
 
-    elif request.method == 'GET':
-        cur = conn.cursor()
-        cur.execute("SELECT urls.id, urls.name, url_checks.created_at, \
-                    url_checks.status_code FROM urls LEFT JOIN url_checks ON \
-                    urls.id = url_checks.url_id WHERE \
-                    (url_checks.id IS NULL OR url_checks.id IN \
-                    (SELECT id FROM url_checks WHERE created_at IN \
-                    (SELECT MAX(created_at) FROM url_checks GROUP BY \
-                    url_id))) ORDER BY urls.id DESC")
-        records = cur.fetchall()
-        messages = get_flashed_messages(with_categories=True)
-        cur.close()
-        return render_template('urls.html', messages=messages,
-                               rows=records), 200
+    cur.execute("SELECT id FROM urls WHERE name = (%s)", (link,))
+    records = cur.fetchall()
+
+    if records:
+        flash('Страница уже существует', 'info')
+        return redirect(url_for('site', id=records[0][0]), code=302)
+
+    cur.execute("INSERT INTO urls \
+                (name, created_at) \
+                VALUES ((%s), (%s))", (link, time.time()))
+    conn.commit()
+    cur.execute("SELECT MAX(id) FROM urls")
+    max_id = cur.fetchall()
+    flash('Страница успешно добавлена', 'success')
+    cur.close()
+    return redirect(url_for('site', id=max_id[0][0]), code=302)
 
 
 @app.route('/urls/<id>', methods=['GET'])
@@ -160,6 +159,6 @@ def timectime(timestamp):
 
 
 @app.errorhandler(404)
-def page_not_found(e):
+def page_not_found():
     messages = get_flashed_messages(with_categories=True)
     return render_template('404.html', messages=messages), 404

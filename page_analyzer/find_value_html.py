@@ -7,14 +7,12 @@ def get_value(text, value):
     if value == 'h1':
         return soup.h1.string if soup.h1 else ""
 
-    elif value == 'title':
+    if value == 'title':
         return soup.title.string if soup.title else ""
 
-    elif value == 'content':
-        for item in soup.find_all(attrs={'name': 'description'}):
-            if item.get('content'):
-                return item.get('content')
-        return ""
+    if value == 'content':
+        dct = {'name': 'description'}
+        array = [x for x in soup.find_all(attrs=dct) if x.get('content')]
+        return array[0].get('content') if len(array) else ""
 
-    else:
-        return ""
+    return None
