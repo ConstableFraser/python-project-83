@@ -26,7 +26,9 @@ conn = psycopg2.connect(dbname=dbname,
                         password=password,
                         host=host)
 
-init_db(conn.cursor(), conn)
+cursor = conn.cursor()
+init_db(cursor, conn)
+cursor.close()
 
 
 @app.route('/', methods=['GET'])
@@ -159,6 +161,6 @@ def timectime(timestamp):
 
 
 @app.errorhandler(404)
-def page_not_found():
+def page_not_found(e):
     messages = get_flashed_messages(with_categories=True)
     return render_template('404.html', messages=messages), 404

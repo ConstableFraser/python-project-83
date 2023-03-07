@@ -17,4 +17,3 @@ def init_db(cur, conn):
                  created_at float)")
 
     conn.commit()
-    cur.close()
