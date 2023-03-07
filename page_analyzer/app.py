@@ -21,6 +21,11 @@ dbname = os.environ.get("DBNAME")
 user = os.environ.get("USER")
 password = os.environ.get("PASSWORD")
 host = os.environ.get("HOST")
+print("DBNAME:", dbname)
+print("USER:", user)
+print("PASSWORD:", password)
+print("HOST:", host)
+
 conn = psycopg2.connect(dbname=dbname,
                         user=user,
                         password=password,
