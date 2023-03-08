@@ -15,12 +15,12 @@ app = Flask(__name__)
 
 load_dotenv(find_dotenv())
 
-app.secret_key = os.getenv("SECRETKEY")
+app.secret_key = os.environ.get("SECRETKEY")
 
-dbname = os.getenv("DBNAME")
-user = os.getenv("USER")
-password = os.getenv("PASSWORD")
-host = os.getenv("HOST")
+dbname = os.environ.get("DBNAME")
+user = os.environ.get("USER")
+password = os.environ.get("PASSWORD")
+host = os.environ.get("HOST")
 
 conn = psycopg2.connect(dbname=dbname,
                         user=user,
