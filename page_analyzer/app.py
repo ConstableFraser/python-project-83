@@ -29,7 +29,7 @@ print("DBNAME:", dbname)
 print("USER:", user)
 print("PASSWORD:", password)
 print("HOST:", host)
-# print("==============LOAD_DOTENV()===============", load_dotenv())
+print("==============OS.ENVIRON.ITEMS()===============\n", os.environ.items())
 
 conn = psycopg2.connect(dbname=dbname,
                         user=user,
