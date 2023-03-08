@@ -13,7 +13,7 @@ from flask import (Flask, render_template, request, redirect,
 
 app = Flask(__name__)
 
-load_dotenv(find_dotenv())
+load_dotenv()
 
 app.secret_key = os.environ.get("SECRETKEY")
 
@@ -22,10 +22,10 @@ user = os.getenv("USER")
 password = os.getenv("PASSWORD")
 host = os.getenv("HOST")
 
-if dbname == '':
-    os.environ['page_analyzer']
-    print("==============OS.ENVIRON.ITEMS()===============\n", os.environ.items())
-    print(os.environ.get("DBNAME"))
+# if dbname == '':
+#    os.environ['page_analyzer']
+#    print("==============OS.ENVIRON.ITEMS()===============\n", os.environ.items())
+#    print(os.environ.get("DBNAME"))
 # dbname = os.environ.get("DBNAME")
 # user = os.environ.get("USER")
 # password = os.environ.get("PASSWORD")
