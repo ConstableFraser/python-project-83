@@ -13,7 +13,7 @@ from flask import (Flask, render_template, request, redirect,
 
 app = Flask(__name__)
 
-# load_dotenv(find_dotenv())
+load_dotenv(find_dotenv())
 
 app.secret_key = os.environ.get("SECRETKEY")
 
@@ -21,7 +21,8 @@ dbname = os.getenv("DBNAME")
 user = os.getenv("USER")
 password = os.getenv("PASSWORD")
 host = os.getenv("HOST")
-if not dbname:
+
+if dbname == '':
     os.environ['page_analyzer']
     print("==============OS.ENVIRON.ITEMS()===============\n", os.environ.items())
     print(os.environ.get("DBNAME"))
