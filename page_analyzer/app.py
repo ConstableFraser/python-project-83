@@ -13,7 +13,7 @@ from flask import (Flask, render_template, request, redirect,
 
 app = Flask(__name__)
 
-# load_dotenv(find_dotenv())
+load_dotenv(find_dotenv())
 
 app.secret_key = os.getenv("SECRETKEY")
 
@@ -21,9 +21,6 @@ dbname = os.getenv("DBNAME")
 user = os.getenv("USER")
 password = os.getenv("PASSWORD")
 host = os.getenv("HOST")
-
-# if dbname not in os.environ:
-#    os.environ['page_analyzer']
 
 conn = psycopg2.connect(dbname=dbname,
                         user=user,
