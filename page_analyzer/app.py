@@ -21,15 +21,20 @@ dbname = os.getenv("DBNAME")
 user = os.getenv("USER")
 password = os.getenv("PASSWORD")
 host = os.getenv("HOST")
+if not dbname:
+    os.environ['page_analyzer']
+    print("==============OS.ENVIRON.ITEMS()===============\n", os.environ.items())
+    print(os.environ.get("DBNAME"))
 # dbname = os.environ.get("DBNAME")
 # user = os.environ.get("USER")
 # password = os.environ.get("PASSWORD")
 # host = os.environ.get("HOST")
-print("DBNAME:", dbname)
-print("USER:", user)
-print("PASSWORD:", password)
-print("HOST:", host)
-print("==============OS.ENVIRON.ITEMS()===============\n", os.environ.items())
+# print("DBNAME:", dbname)
+# print("USER:", user)
+# print("PASSWORD:", password)
+# print("HOST:", host)
+
+# print("==============OS.ENVIRON.ITEMS()===============\n", os.environ.items())
 
 conn = psycopg2.connect(dbname=dbname,
                         user=user,
