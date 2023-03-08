@@ -62,6 +62,17 @@ def test_correct(tag, html, correct):
     assert get_content(correct) == value
 
 
+def test_get_value_unknown():
+    text = get_content("tests/fixtures/correct/ramokna_ru.html")
+    value = get_value(text, "meta")
+    assert value is None
+
+
+def test_get_content():
+    value = open("tests/fixtures/example_txt_file.txt", "r").read()
+    assert "this is a text file" == value
+
+
 @pytest.mark.parametrize(
     "tag, html, correct",
     [pytest.param("h1",
@@ -79,8 +90,3 @@ def test_correct(tag, html, correct):
 def test_fails(tag, html, correct):
     value = get_value(get_content(html), tag)
     assert correct == value
-
-
-def test_get_content():
-    value = open("tests/fixtures/example_txt_file.txt", "r").read()
-    assert "this is a text file" == value
