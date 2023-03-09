@@ -1,11 +1,7 @@
 import pytest
 from page_analyzer.app import app
-from dotenv import load_dotenv, find_dotenv
 from page_analyzer.find_value_html import get_value
 from page_analyzer.get_content import get_content
-
-
-load_dotenv(find_dotenv())
 
 
 @pytest.fixture()

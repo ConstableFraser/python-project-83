@@ -1,10 +1,10 @@
 import os
 import time
-import psycopg2
 import requests
 from datetime import datetime
 from validators.url import url
 from urllib.parse import urlparse
+from page_analyzer.init_db import get_db
 from page_analyzer.init_db import init_db
 from dotenv import load_dotenv, find_dotenv
 from page_analyzer.find_value_html import get_value
@@ -14,22 +14,8 @@ from flask import (Flask, render_template, request, redirect,
 app = Flask(__name__)
 
 load_dotenv(find_dotenv())
-
 app.secret_key = os.environ.get("SECRETKEY")
-
-dbname = os.environ.get("DBNAME")
-user = os.environ.get("USER")
-password = os.environ.get("PASSWORD")
-host = os.environ.get("HOST")
-
-conn = psycopg2.connect(dbname=dbname,
-                        user=user,
-                        password=password,
-                        host=host)
-
-cursor = conn.cursor()
-init_db(cursor, conn)
-cursor.close()
+init_db()
 
 
 @app.route('/', methods=['GET'])
@@ -40,7 +26,7 @@ def start():
 
 @app.route('/urls', methods=['GET'])
 def sites():
-    cur = conn.cursor()
+    cur = get_db().cursor()
     cur.execute("SELECT urls.id, urls.name, url_checks.created_at, \
                 url_checks.status_code FROM urls LEFT JOIN url_checks ON \
                 urls.id = url_checks.url_id WHERE \
@@ -63,6 +49,7 @@ def add():
     netloc = address[1]
     path = address[2]
     link = scheme + netloc + path
+    conn = get_db()
     cur = conn.cursor()
     if len(link) > 255 or not url(link):
         flash('Некорректный URL', 'danger')
@@ -84,12 +71,13 @@ def add():
     max_id = cur.fetchall()
     flash('Страница успешно добавлена', 'success')
     cur.close()
+    conn.close()
     return redirect(url_for('site', id=max_id[0][0]), code=302)
 
 
 @app.route('/urls/<id>', methods=['GET'])
 def site(id):
-    cur = conn.cursor()
+    cur = get_db().cursor()
     id = int(id) if id.isdigit() else None
     cur.execute("SELECT name FROM urls WHERE id = (%s)", (id,))
     records = cur.fetchall()
@@ -121,6 +109,7 @@ def site(id):
 
 @app.post('/urls/<id>/checks')
 def check(id):
+    conn = get_db()
     cur = conn.cursor()
     cur.execute("SELECT name FROM urls WHERE id = (%s)", (id,))
     records = cur.fetchall()
@@ -149,6 +138,7 @@ def check(id):
                 (id, status_code, h1, title, content, time.time()))
     conn.commit()
     cur.close()
+    conn.close()
 
     return redirect(url_for('site', id=id), code=302)
 

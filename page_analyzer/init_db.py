@@ -1,4 +1,23 @@
-def init_db(cur, conn):
+import os
+import psycopg2
+from dotenv import load_dotenv, find_dotenv
+
+
+def get_db():
+    load_dotenv(find_dotenv())
+    dbname = os.environ.get("DBNAME")
+    user = os.environ.get("USER")
+    password = os.environ.get("PASSWORD")
+    host = os.environ.get("HOST")
+    return psycopg2.connect(dbname=dbname,
+                            user=user,
+                            password=password,
+                            host=host)
+
+
+def init_db():
+    conn = get_db()
+    cur = conn.cursor()
     cur.execute("DROP TABLE IF EXISTS url_checks")
     cur.execute("DROP TABLE IF EXISTS urls")
 
@@ -17,3 +36,5 @@ def init_db(cur, conn):
                  created_at float)")
 
     conn.commit()
+    cur.close()
+    conn.close()
