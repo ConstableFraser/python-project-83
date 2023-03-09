@@ -1,4 +1,3 @@
-import os
 import pytest
 from page_analyzer.app import app
 from dotenv import load_dotenv, find_dotenv
@@ -7,10 +6,6 @@ from page_analyzer.get_content import get_content
 
 
 load_dotenv(find_dotenv())
-dbname = os.environ.get("DBNAME")
-user = os.environ.get("USER")
-password = os.environ.get("PASSWORD")
-host = os.environ.get("HOST")
 
 
 @pytest.fixture()
