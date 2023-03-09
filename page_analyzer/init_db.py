@@ -1,14 +1,18 @@
 import os
 import psycopg2
-from dotenv import load_dotenv, find_dotenv
+from dotenv import load_dotenv
+
+
+load_dotenv()
+dbname = os.getenv("DBNAME")
+user = os.getenv("USER")
+password = os.getenv("PASSWORD")
+host = os.getenv("HOST")
 
 
 def get_db():
-    load_dotenv(find_dotenv())
-    dbname = os.environ.get("DBNAME")
-    user = os.environ.get("USER")
-    password = os.environ.get("PASSWORD")
-    host = os.environ.get("HOST")
+    print("DBNAME:\t", dbname)
+    print("USER:\t", user)
     return psycopg2.connect(dbname=dbname,
                             user=user,
                             password=password,
