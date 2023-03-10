@@ -12,9 +12,9 @@ host = os.getenv("HOST")
 
 def get_db():
     if 'DBNAME' not in os.environ:
-        os.environ['DBNAME'] = 'page_analyzer_db'
-        os.environ['USER'] = 'sanswed'
-        os.environ['PASSWORD'] = 'hexlet_pwd'
+        os.environ['DBNAME'] = 'postgres'
+        os.environ['USER'] = 'postgres'
+        os.environ['PASSWORD'] = 'postgres'
         os.environ['HOST'] = 'localhost'
         print("os.environ[DBNAME]:\t", os.environ['DBNAME'])
     load_dotenv()
