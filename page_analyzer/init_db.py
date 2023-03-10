@@ -16,6 +16,13 @@ def get_db():
         os.environ['USER'] = 'sanswed'
         os.environ['PASSWORD'] = 'hexlet_pwd'
         os.environ['HOST'] = 'localhost'
+        print("os.environ[DBNAME]:\t", os.environ['DBNAME'])
+    load_dotenv()
+    dbname = os.getenv("DBNAME")
+    user = os.getenv("USER")
+    password = os.getenv("PASSWORD")
+    host = os.getenv("HOST")
+
     print("DBNAME:\t", dbname)
     print("USER:\t", user)
     return psycopg2.connect(dbname=dbname,
