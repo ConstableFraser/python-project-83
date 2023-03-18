@@ -56,6 +56,7 @@ def add():
 
             if records:
                 flash('Страница уже существует', 'info')
+                print("THE PAGE ALREADY EXIST")
                 return redirect(url_for('site', id=records[0]))
 
             cur.execute("INSERT INTO urls (name, created_at) \
@@ -63,6 +64,7 @@ def add():
             max_id = cur.fetchone()
             conn.commit()
             flash('Страница успешно добавлена', 'success')
+            print("THE PAGE HAS BEEN ADDED")
             return redirect(url_for('site', id=max_id[0]))
 
 
