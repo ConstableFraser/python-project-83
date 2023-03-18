@@ -56,14 +56,14 @@ def add():
 
             if records:
                 flash('Страница уже существует', 'info')
-                return redirect(url_for('site', id=records[0]), code=302)
+                return redirect(url_for('site', id=records[0]))
 
             cur.execute("INSERT INTO urls (name, created_at) \
                         VALUES ((%s), (%s)) RETURNING id", (link, time.time()))
             max_id = cur.fetchone()
             conn.commit()
             flash('Страница успешно добавлена', 'success')
-            return redirect(url_for('site', id=max_id[0]), code=302)
+            return redirect(url_for('site', id=max_id[0]))
 
 
 @app.route('/urls/<id>', methods=['GET'])
