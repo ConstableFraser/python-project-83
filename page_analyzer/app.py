@@ -19,13 +19,11 @@ init_db()
 
 @app.route('/', methods=['GET'])
 def start():
-    print("OPENED INDEX.HTML")
     return render_template('index.html')
 
 
 @app.route('/urls', methods=['GET'])
 def sites():
-    print("OPENED URLS.HTML")
     with get_db().cursor() as cur:
         cur.execute("SELECT urls.id, urls.name, url_checks.created_at, \
                     url_checks.status_code FROM urls LEFT JOIN url_checks ON \
@@ -40,7 +38,6 @@ def sites():
 
 @app.post('/urls')
 def add():
-    print("PUSHED BUTTON SUBMIT")
     address = urlparse(request.form.get('url'))
     scheme = address[0] if address[0] else 'http'
     scheme += '://'
@@ -59,7 +56,6 @@ def add():
 
             if records:
                 flash('Страница уже существует', 'info')
-                print("THE PAGE ALREADY EXIST")
                 return redirect(url_for('site', id=records[0]))
 
             cur.execute("INSERT INTO urls (name, created_at) \
@@ -67,13 +63,11 @@ def add():
             max_id = cur.fetchone()
             conn.commit()
             flash('Страница успешно добавлена', 'success')
-            print("THE PAGE HAS BEEN ADDED")
             return redirect(url_for('site', id=max_id[0]))
 
 
 @app.route('/urls/<id>', methods=['GET'])
 def site(id):
-    print("OPENED SITE WITH ID: ", id)
     with get_db().cursor() as cur:
         id = int(id) if id.isdigit() else None
         cur.execute("SELECT name FROM urls WHERE id = (%s)", (id,))
@@ -102,7 +96,6 @@ def site(id):
 
 @app.post('/urls/<id>/checks')
 def check(id):
-    print("PUSHED BUTTON CHECKED, SITE: ", id)
     with get_db() as conn:
         with conn.cursor() as cur:
             cur.execute("SELECT name FROM urls WHERE id = (%s)", (id,))
