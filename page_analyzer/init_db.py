@@ -3,32 +3,11 @@ import psycopg2
 from dotenv import load_dotenv
 
 
-load_dotenv()
-dbname = os.getenv("DBNAME")
-user = os.getenv("USER")
-password = os.getenv("PASSWORD")
-host = os.getenv("HOST")
-
-
 def get_db():
-    if 'DBNAME' not in os.environ:
-        os.environ['DBNAME'] = 'postgres'
-        os.environ['USER'] = 'postgres'
-        os.environ['PASSWORD'] = 'postgres'
-        os.environ['HOST'] = 'localhost'
-        print("os.environ[DBNAME]:\t", os.environ['DBNAME'])
     load_dotenv()
-    dbname = os.getenv("DBNAME")
-    user = os.getenv("USER")
-    password = os.getenv("PASSWORD")
-    host = os.getenv("HOST")
+    DATABASE_URL = os.getenv('DATABASE_URL')
 
-    print("DBNAME:\t", dbname)
-    print("USER:\t", user)
-    return psycopg2.connect(dbname=dbname,
-                            user=user,
-                            password=password,
-                            host=host)
+    return psycopg2.connect(DATABASE_URL)
 
 
 def init_db():
