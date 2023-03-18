@@ -43,6 +43,7 @@ jobs:
           HOST: ${{ vars.HOST }}
           PASSWORD: postgres
           SECRETKEY: ${{ secrets.SECRETKEY }}
+          DATABASE_URL: ${{ vars.DATABASE_URL }}
         with:
           coverageCommand: make test-coverage-xml
           debug: true
