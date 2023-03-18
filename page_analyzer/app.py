@@ -1,20 +1,17 @@
-import os
 import time
 import requests
 from datetime import datetime
 from validators.url import url
 from urllib.parse import urlparse
-from page_analyzer.init_db import get_db
-from page_analyzer.init_db import init_db
-from dotenv import load_dotenv, find_dotenv
+from page_analyzer.rand import get_random
+from page_analyzer.init_db import get_db, init_db
 from page_analyzer.find_value_html import get_value
 from flask import (Flask, render_template, request, redirect,
                    url_for, flash)
 
 app = Flask(__name__)
 
-load_dotenv(find_dotenv())
-app.secret_key = os.environ.get("SECRETKEY")
+app.secret_key = get_random()
 init_db()
 
 
