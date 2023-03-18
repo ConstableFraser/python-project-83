@@ -9,6 +9,8 @@ from page_analyzer.find_value_html import get_value
 from flask import (Flask, render_template, request, redirect,
                    url_for, flash)
 
+
+MAX_LENGTH = 255
 app = Flask(__name__)
 
 app.secret_key = get_random()
@@ -43,9 +45,9 @@ def add():
     path = address[2]
     link = scheme + netloc + path
 
-    if len(link) > 255 or not url(link):
+    if len(link) > MAX_LENGTH or not url(link):
         flash('Некорректный URL', 'danger')
-        return render_template('index.html'), 302
+        return render_template('index.html'), 422
 
     with get_db() as conn:
         with conn.cursor() as cur:
