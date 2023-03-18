@@ -45,7 +45,7 @@ def add():
 
     if len(link) > 255 or not url(link):
         flash('Некорректный URL', 'danger')
-        return redirect(url_for('start'), code=302)
+        return render_template('index.html'), 302
 
     with get_db() as conn:
         with conn.cursor() as cur:
