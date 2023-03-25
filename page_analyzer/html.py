@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 
 
-def get_value(text, value):
+def get_page_contents(text, value):
     soup = BeautifulSoup(text, 'html.parser')
 
     if value == 'h1':

@@ -1,11 +1,12 @@
-import time
+import os
+import secrets
 import requests
+import psycopg2.extras
 from datetime import datetime
 from validators.url import url
 from urllib.parse import urlparse
-from page_analyzer.rand import get_random
-from page_analyzer.init_db import get_db, init_db
-from page_analyzer.find_value_html import get_value
+from page_analyzer.db import get_db
+from page_analyzer.html import get_page_contents
 from flask import (Flask, render_template, request, redirect,
                    url_for, flash)
 
@@ -13,8 +14,9 @@ from flask import (Flask, render_template, request, redirect,
 MAX_LENGTH = 255
 app = Flask(__name__)
 
-app.secret_key = get_random()
-init_db()
+
+secret_key = os.getenv('SECRET_KEY')
+app.secret_key = secret_key if secret_key else secrets.token_bytes(32)
 
 
 @app.route('/', methods=['GET'])
@@ -24,15 +26,21 @@ def start():
 
 @app.route('/urls', methods=['GET'])
 def sites():
-    with get_db().cursor() as cur:
-        cur.execute("SELECT urls.id, urls.name, url_checks.created_at, \
-                    url_checks.status_code FROM urls LEFT JOIN url_checks ON \
-                    urls.id = url_checks.url_id WHERE \
-                    (url_checks.id IS NULL OR url_checks.id IN \
-                    (SELECT id FROM url_checks WHERE created_at IN \
-                    (SELECT MAX(created_at) FROM url_checks GROUP BY \
-                    url_id))) ORDER BY urls.id DESC")
+    factory = psycopg2.extras.NamedTupleCursor
+    with get_db().cursor(cursor_factory=factory) as cur:
+        cur.execute("SELECT \
+                        urls.id AS id, urls.name AS name, \
+                        url_checks.created_at as created_at, \
+                        url_checks.status_code as status_code\
+                     FROM urls \
+                     LEFT JOIN url_checks ON urls.id = url_checks.url_id \
+                        WHERE (url_checks.id IS NULL OR url_checks.id IN \
+                              (SELECT MAX(id) \
+                               FROM url_checks \
+                               GROUP BY url_id)) \
+                     ORDER BY urls.id DESC")
         records = cur.fetchall()
+        print(records)
     return render_template('urls.html', rows=records), 200
 
 
@@ -59,16 +67,18 @@ def add():
                 return redirect(url_for('site', id=records[0]))
 
             cur.execute("INSERT INTO urls (name, created_at) \
-                        VALUES ((%s), (%s)) RETURNING id", (link, time.time()))
+                        VALUES (%s, %s) RETURNING id", (link, datetime.today()))
             max_id = cur.fetchone()
             conn.commit()
+
             flash('Страница успешно добавлена', 'success')
             return redirect(url_for('site', id=max_id[0]))
 
 
 @app.route('/urls/<id>', methods=['GET'])
 def site(id):
-    with get_db().cursor() as cur:
+    factory = psycopg2.extras.NamedTupleCursor
+    with get_db().cursor(cursor_factory=factory) as cur:
         id = int(id) if id.isdigit() else None
         cur.execute("SELECT name FROM urls WHERE id = (%s)", (id,))
         site_name = cur.fetchone()
@@ -114,24 +124,17 @@ def check(id):
 
             status_code = response.status_code
 
-            h1 = get_value(response.text, 'h1')
-            title = get_value(response.text, 'title')
-            content = get_value(response.text, 'content')
+            h1 = get_page_contents(response.text, 'h1')
+            title = get_page_contents(response.text, 'title')
+            content = get_page_contents(response.text, 'content')
 
             cur.execute("INSERT INTO url_checks \
                         (url_id, status_code, h1, title, description, \
                         created_at) VALUES (%s, %s, %s, %s, %s, %s)",
-                        (id, status_code, h1, title, content, time.time()))
+                        (id, status_code, h1, title, content, datetime.today()))
             conn.commit()
+    flash('Страница успешно проверена', 'success')
     return redirect(url_for('site', id=id), code=302)
-
-
-@app.template_filter('date')
-def timectime(timestamp):
-    if timestamp is not None:
-        return datetime.date(datetime.fromtimestamp(timestamp))
-    else:
-        return ""
 
 
 @app.errorhandler(404)
