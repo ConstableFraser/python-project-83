@@ -34,7 +34,7 @@ def add():
         return render_template('index.html'), 422
 
     id = add_site(link)
-    return redirect(url_for('site', id=id), code=302)
+    return redirect(url_for('site', id=id))
 
 
 @app.route('/urls/<int:id>', methods=['GET'])
