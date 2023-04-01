@@ -1,10 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <main class="flex-grow-1">
-    <div class="container-lg mt-3">
       <h1>Сайты</h1>
-
     
 <div class="table-responsive">
   <table class="table table-bordered table-hover text-nowrap" data-test="urls">
@@ -18,7 +15,7 @@
         {% for row in rows %}
         <tr>
           <td>{{ row.id }}</td>
-          <td><a href="{{ url_for("site", id=row.id) }}">{{ row.name }}</a></td>          
+          <td><a href="{{ url_for("url", id=row.id) }}">{{ row.name }}</a></td>          
           <td>{% if row.created_at  %} {{ row.created_at.strftime("%Y-%m-%d") }} {% endif %}</td>
           <td>{% if row.status_code %} {{ row.status_code }} {% endif %}</td>
         </tr>
@@ -26,7 +23,4 @@
     </tbody>
   </table>
 </div>
-
-    </div>
-  </main>
 {% endblock %}

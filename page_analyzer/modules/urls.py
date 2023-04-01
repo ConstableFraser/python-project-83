@@ -1,6 +1,5 @@
 import requests
 import psycopg2.extras
-from flask import flash
 from datetime import datetime
 from validators.url import url
 
@@ -31,21 +30,22 @@ def check_url(link):
     return True
 
 
-def add_site(link):
+def check_exist(link):
     with get_db() as conn:
         with conn.cursor() as cur:
             cur.execute(SELECT["URL_id"], (link,))
             records = cur.fetchone()
 
-            if records:
-                flash('Страница уже существует', 'info')
-                return str(*records)
+            return str(*records) if records else None
 
+
+def add_site(link):
+    with get_db() as conn:
+        with conn.cursor() as cur:
             cur.execute(INSERT["URL_row"], (link, datetime.today()))
             id = cur.fetchone()
             conn.commit()
 
-            flash('Страница успешно добавлена', 'success')
             return str(*id)
 
 
@@ -80,7 +80,6 @@ def check_site(id):
             try:
                 response = requests.get(url, headers=headers)
             except requests.ConnectionError:
-                flash('Произошла ошибка про проверке', 'danger')
                 return False
 
             status_code = response.status_code
@@ -93,5 +92,5 @@ def check_site(id):
             cur.execute(INSERT["CHECKS_row"],
                         (id, status_code, h1, title, content, datetime.today()))
             conn.commit()
-            flash('Страница успешно проверена', 'success')
+
             return True
