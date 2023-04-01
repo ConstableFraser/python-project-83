@@ -55,7 +55,7 @@ def site(id):
 @app.post('/urls/<int:id>/checks')
 def check(id):
     check_site(id)
-    return redirect(url_for('site', id=id), code=302)
+    return redirect(url_for('site', id=id))
 
 
 @app.errorhandler(404)
