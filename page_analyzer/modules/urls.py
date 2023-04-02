@@ -84,13 +84,11 @@ def check_site(id):
 
             status_code = response.status_code
 
-            h1, title, content = get_page_contents(response.text,
-                                                   'h1',
-                                                   'title',
-                                                   'content')
+            tags = get_page_contents(response.text)
 
             cur.execute(INSERT["CHECKS_row"],
-                        (id, status_code, h1, title, content, datetime.today()))
+                        (id, status_code, tags["h1"], tags["title"],
+                         tags["description"], datetime.today()))
             conn.commit()
 
             return True

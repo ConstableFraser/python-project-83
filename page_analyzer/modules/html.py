@@ -1,18 +1,16 @@
 from bs4 import BeautifulSoup
 
 
-def get_page_contents(text, *args):
+def get_page_contents(text):
     soup = BeautifulSoup(text, 'html.parser')
+    description = ''
 
-    if args.count('h1'):
-        h1 = soup.h1.string if soup.h1 else None
+    h1 = soup.h1.string if soup.h1 else ''
 
-    if args.count('title'):
-        title = soup.title.string if soup.title else None
+    title = soup.title.string if soup.title else ''
 
-    if args.count('content'):
-        dct = {'name': 'description'}
-        array = [x for x in soup.find_all(attrs=dct) if x.get('content')]
-        description = array[0].get('content') if len(array) else None
+    dct = {'name': 'description'}
+    array = [x for x in soup.find_all(attrs=dct) if x.get('content')]
+    description = array[0].get('content') if len(array) else ''
 
-    return h1, title, description
+    return {"h1": h1, "title": title, "description": description}
