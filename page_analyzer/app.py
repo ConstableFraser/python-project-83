@@ -61,7 +61,7 @@ def check(id):
     if check_site(id):
         flash('Страница успешно проверена', 'success')
     else:
-        flash('Произошла ошибка про проверке', 'danger')
+        flash('Произошла ошибка при проверке', 'danger')
 
     return redirect(url_for('url', id=id), code=302)
 
