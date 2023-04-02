@@ -79,8 +79,8 @@ def check_site(id):
 
             try:
                 response = requests.get(url, headers=headers)
-            except requests.ConnectionError:
-                raise Exception('Произошла ошибка при проверке')
+                response.raise_for_status()
+            except requests.RequestException:
                 return False
 
             status_code = response.status_code

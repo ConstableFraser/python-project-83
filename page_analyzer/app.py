@@ -59,9 +59,7 @@ def url(id):
 
 @app.post('/urls/<int:id>/checks')
 def check(id):
-    try:
-        check_site(id)
-    except Exception:
+    if not check_site(id):
         flash('Произошла ошибка при проверке', 'danger')
         return redirect(url_for('url', id=id), code=302)
 
