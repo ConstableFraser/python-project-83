@@ -1,7 +1,6 @@
 {% extends "base.html" %}
-
+{% block title %}Сайт: {{ url.name }}{% endblock %}
 {% block content %}
-      <h1>Сайт: {{ record.name }}</h1>    
   <div class="table-responsive">
     <table class="table table-bordered table-hover text-nowrap" data-test="url">
       <tbody>
