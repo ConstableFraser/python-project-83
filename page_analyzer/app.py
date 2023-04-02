@@ -1,8 +1,7 @@
 import os
-import secrets
 from urllib.parse import urlparse
 from flask import (Flask, render_template, request, redirect,
-                   url_for, flash, get_flashed_messages)
+                   url_for, flash)
 
 from page_analyzer.modules.urls import (get_list_sites, check_site,
                                         normalize_url, check_url,
@@ -11,8 +10,8 @@ from page_analyzer.modules.urls import (get_list_sites, check_site,
 
 
 app = Flask(__name__)
-secret_key = os.getenv('SECRET_KEY')
-app.secret_key = secret_key if secret_key else secrets.token_bytes(32)
+secret_key = os.getenv('SECRET_KEY', b'_5#y$$"F4f8z\n\xec]/')
+app.secret_key = secret_key
 
 
 @app.route('/')
@@ -32,8 +31,7 @@ def add():
     link = normalize_url(address)
     if not check_url(link):
         flash('Некорректный URL', 'danger')
-        messages = get_flashed_messages(with_categories=True)
-        return render_template('index.html', messages=messages), 422
+        return render_template('index.html'), 422
 
     id = check_exist(link)
     if id:
@@ -51,14 +49,11 @@ def url(id):
 
     if not record:
         flash('Такой страницы не существует', 'danger')
-        messages = get_flashed_messages(with_categories=True)
-        return render_template('404.html', messages=messages)
+        return render_template('404.html')
 
-    messages = get_flashed_messages(with_categories=True)
     return render_template('url_id.html',
                            record=record,
-                           checks=checks,
-                           messages=messages)
+                           checks=checks)
 
 
 @app.post('/urls/<int:id>/checks')
