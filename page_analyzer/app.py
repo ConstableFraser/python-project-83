@@ -40,6 +40,7 @@ def add():
 
     id = add_site(link)
     flash('Страница успешно добавлена', 'success')
+    print("===========PAGE HAS BEEN ADDED==========: ", id)
     return redirect(url_for('url', id=id), code=302)
 
 
