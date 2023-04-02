@@ -40,7 +40,7 @@ def add():
 
     id = add_site(link)
     flash('Страница успешно добавлена', 'success')
-    print("===========PAGE HAS BEEN ADDED==========: ", id)
+
     return redirect(url_for('url', id=id), code=302)
 
 
@@ -59,12 +59,13 @@ def url(id):
 
 @app.post('/urls/<int:id>/checks')
 def check(id):
-    print("=========PUSHED CHECK=======: ", id)
-    if check_site(id):
-        flash('Страница успешно проверена', 'success')
-    else:
+    try:
+        check_site(id)
+    except Exception:
         flash('Произошла ошибка при проверке', 'danger')
+        return redirect(url_for('url', id=id), code=302)
 
+    flash('Страница успешно проверена', 'success')
     return redirect(url_for('url', id=id), code=302)
 
 

@@ -74,13 +74,13 @@ def check_site(id):
             records = cur.fetchone()
             url = str(*records)
 
-            # headers = requests.utils.default_headers()
-            # headers.update({'User-Agent': 'My User Agent 1.0'})
+            headers = requests.utils.default_headers()
+            headers.update({'User-Agent': 'My User Agent 1.0'})
 
             try:
-                response = requests.get(url)
-                # , headers=headers
+                response = requests.get(url, headers=headers)
             except requests.ConnectionError:
+                raise Exception('Произошла ошибка при проверке')
                 return False
 
             status_code = response.status_code
