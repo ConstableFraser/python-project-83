@@ -58,6 +58,7 @@ def url(id):
 
 @app.post('/urls/<int:id>/checks')
 def check(id):
+    print("=========PUSHED CHECK=======: ", id)
     if check_site(id):
         flash('Страница успешно проверена', 'success')
     else:
