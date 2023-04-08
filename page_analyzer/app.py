@@ -1,8 +1,8 @@
 import os
 import requests
 from urllib.parse import urlparse
-from flask import (Flask, render_template, request, redirect,
-                   url_for, flash)
+from flask import (Flask, render_template, request,
+                   redirect, url_for, flash)
 
 from page_analyzer.modules import util
 from page_analyzer.database import urls, checks
@@ -27,9 +27,8 @@ def sites():
 
 @app.post('/urls')
 def add():
-    address = urlparse(request.form.get('url'))
-    link = util.normalize_url(address)
-    if not util.check_url(link):
+    link = util.build_url(urlparse(request.form.get('url')))
+    if not link:
         flash('Некорректный URL', 'danger')
         return render_template('index.html'), 422
 
