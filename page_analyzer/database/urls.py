@@ -1,11 +1,9 @@
-import psycopg2.extras
 from datetime import datetime
-from page_analyzer.database.db_conn import get_db
+from page_analyzer.database.db import get_db, get_cursor_tuple
 
 
 def get_list():
-    factory = psycopg2.extras.NamedTupleCursor
-    with get_db().cursor(cursor_factory=factory) as cur:
+    with get_cursor_tuple() as cur:
         cur.execute("SELECT \
                          urls.id AS id, urls.name AS name, \
                          url_checks.created_at as created_at, \
@@ -29,15 +27,13 @@ def get_id(link):
 
 
 def get_name(id):
-    factory = psycopg2.extras.NamedTupleCursor
-    with get_db().cursor(cursor_factory=factory) as cur:
+    with get_cursor_tuple() as cur:
         cur.execute("SELECT name FROM urls WHERE id = (%s)", (id,))
         return cur.fetchone()
 
 
 def get_url_info(id):
-    factory = psycopg2.extras.NamedTupleCursor
-    with get_db().cursor(cursor_factory=factory) as cur:
+    with get_cursor_tuple() as cur:
         cur.execute("SELECT id, name, created_at FROM urls \
                      WHERE id = (%s)", (id,))
         return cur.fetchone()

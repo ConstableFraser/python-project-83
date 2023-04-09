@@ -1,11 +1,9 @@
-import psycopg2.extras
 from datetime import datetime
-from page_analyzer.database.db_conn import get_db
+from page_analyzer.database.db import get_db, get_cursor_tuple
 
 
 def get_list(id):
-    factory = psycopg2.extras.NamedTupleCursor
-    with get_db().cursor(cursor_factory=factory) as cur:
+    with get_cursor_tuple() as cur:
         cur.execute("SELECT id, status_code, h1, title, \
                             description, created_at \
                      FROM url_checks WHERE url_id = (%s) \
