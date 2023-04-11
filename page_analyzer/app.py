@@ -1,13 +1,14 @@
 import os
 import requests
-from urllib.parse import urlparse
 from flask import (Flask, render_template, request,
                    redirect, url_for, flash)
 
-from page_analyzer.modules import util
+from page_analyzer import util
 from page_analyzer.database import urls, checks
-from page_analyzer.modules.html import get_page_contents
+from page_analyzer.html import get_page_contents
 
+
+MAX_LENGTH = 255
 
 app = Flask(__name__)
 secret_key = os.getenv('SECRET_KEY', b'_5#y$$"F4f8z\n\xec]/')
@@ -21,23 +22,26 @@ def start():
 
 @app.route('/urls')
 def sites():
-    records = urls.get_list()
+    records = urls.get_urls_list()
     return render_template('urls.html', rows=records), 200
 
 
 @app.post('/urls')
 def add():
-    link = util.build_url(urlparse(request.form.get('url')))
-    if not link:
+    user_url = request.form.get('url')
+
+    if not util.is_valid_url(user_url):
         flash('Некорректный URL', 'danger')
         return render_template('index.html'), 422
 
-    id = urls.get_id(link)
+    valid_url = util.normalize_url(user_url)
+
+    id = urls.get_id_url_by_name(valid_url)
     if id:
         flash('Страница уже существует', 'info')
         return redirect(url_for('url', id=id), code=302)
 
-    id = urls.add_url(link)
+    id = urls.add_new_url(valid_url)
     flash('Страница успешно добавлена', 'success')
 
     return redirect(url_for('url', id=id), code=302)
@@ -45,12 +49,12 @@ def add():
 
 @app.route('/urls/<int:id>')
 def url(id):
-    if not urls.get_name(id):
+    if not urls.get_name_url_by_id(id):
         flash('Такой страницы не существует', 'danger')
         return render_template('404.html')
 
-    record = urls.get_url_info(id)
-    check_list = checks.get_list(id)
+    record = urls.get_url_info_by_id(id)
+    check_list = checks.get_checks_list_by_id(id)
     return render_template('url_id.html',
                            record=record,
                            checks=check_list)
@@ -58,7 +62,7 @@ def url(id):
 
 @app.post('/urls/<int:id>/checks')
 def check(id):
-    url_name = urls.get_name(id)
+    url_name = urls.get_name_url_by_id(id)
     headers = requests.utils.default_headers()
     headers.update({'User-Agent': 'My User Agent 1.0'})
 
@@ -71,7 +75,7 @@ def check(id):
 
     status_code = response.status_code
     tags = get_page_contents(response.text)
-    checks.add_check(id, status_code, tags)
+    checks.add_new_check(id, status_code, tags)
 
     flash('Страница успешно проверена', 'success')
     return redirect(url_for('url', id=id), code=302)

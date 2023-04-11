@@ -1,9 +1,11 @@
+import psycopg2.extras
 from datetime import datetime
-from page_analyzer.database.db import get_db, get_cursor_tuple
+from page_analyzer.database.db import get_db
 
 
-def get_list():
-    with get_cursor_tuple() as cur:
+def get_urls_list():
+    factory = psycopg2.extras.NamedTupleCursor
+    with get_db().cursor(cursor_factory=factory) as cur:
         cur.execute("SELECT \
                          urls.id AS id, urls.name AS name, \
                          url_checks.created_at as created_at, \
@@ -18,33 +20,35 @@ def get_list():
         return cur.fetchall()
 
 
-def get_id(link):
+def get_id_url_by_name(url_name):
     with get_db() as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT id FROM urls WHERE name = (%s)", (link,))
+            cur.execute("SELECT id FROM urls WHERE name = (%s)", (url_name,))
             records = cur.fetchone()
             return str(*records) if records else None
 
 
-def get_name(id):
-    with get_cursor_tuple() as cur:
+def get_name_url_by_id(id):
+    factory = psycopg2.extras.NamedTupleCursor
+    with get_db().cursor(cursor_factory=factory) as cur:
         cur.execute("SELECT name FROM urls WHERE id = (%s)", (id,))
         return cur.fetchone()
 
 
-def get_url_info(id):
-    with get_cursor_tuple() as cur:
+def get_url_info_by_id(id):
+    factory = psycopg2.extras.NamedTupleCursor
+    with get_db().cursor(cursor_factory=factory) as cur:
         cur.execute("SELECT id, name, created_at FROM urls \
                      WHERE id = (%s)", (id,))
         return cur.fetchone()
 
 
-def add_url(link):
+def add_new_url(name):
     with get_db() as conn:
         with conn.cursor() as cur:
             cur.execute("INSERT INTO urls (name, created_at) \
                          VALUES (%s, %s) RETURNING id",
-                        (link, datetime.today()))
+                        (name, datetime.today()))
             id = cur.fetchone()
             conn.commit()
             return str(*id)

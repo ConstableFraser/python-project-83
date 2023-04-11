@@ -1,7 +1,13 @@
+### Hexlet tests, linter status, code climate:
+[![Actions Status](https://github.com/ConstableFraser/python-project-83/workflows/hexlet-check/badge.svg)](https://github.com/ConstableFraser/python-project-83/actions)
+[![Linter](https://github.com/ConstableFraser/python-project-83/actions/workflows/Linter.yml/badge.svg)](https://github.com/ConstableFraser/python-project-83/actions/workflows/Linter.yml)
+[![Maintainability](https://api.codeclimate.com/v1/badges/02d7cf3a054818153080/maintainability)](https://codeclimate.com/github/ConstableFraser/python-project-83/maintainability)
+
+
 ## DESCRIPTION
 project name: "Page SEO-analyzer"
 
-### DEPLOY link
+## DEPLOY link
 https://page-analyzer-service.onrender.com
 
 
@@ -22,11 +28,3 @@ python, poetry, flask, gunicorn, jinja2, beautifulsoup, psycopg2, postgresql, bo
 make install - to install dependencies
 make start - to start the application
 ```
- 
-
-### Hexlet tests, linter status, code climate and test coverage:
-[![Actions Status](https://github.com/ConstableFraser/python-project-83/workflows/hexlet-check/badge.svg)](https://github.com/ConstableFraser/python-project-83/actions)
-
-[![Maintainability](https://api.codeclimate.com/v1/badges/02d7cf3a054818153080/maintainability)](https://codeclimate.com/github/ConstableFraser/python-project-83/maintainability)
-[![Linter](https://github.com/ConstableFraser/python-project-83/actions/workflows/Linter.yml/badge.svg)](https://github.com/ConstableFraser/python-project-83/actions/workflows/Linter.yml)
-
