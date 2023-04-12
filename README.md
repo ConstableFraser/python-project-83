@@ -3,7 +3,7 @@
 [![Linter](https://github.com/ConstableFraser/python-project-83/actions/workflows/Linter.yml/badge.svg)](https://github.com/ConstableFraser/python-project-83/actions/workflows/Linter.yml)
 [![Maintainability](https://api.codeclimate.com/v1/badges/02d7cf3a054818153080/maintainability)](https://codeclimate.com/github/ConstableFraser/python-project-83/maintainability)
 
-# PAGE SEO-ANALYZER"
+# PAGE SEO-ANALYZER
 ## useful features:
 1. scanning main page of website for seo-suitability (tags: h1, title and description)
 2. checking website for availability
