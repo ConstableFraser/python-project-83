@@ -15,6 +15,5 @@ def normalize_url(data):
     scheme = address[0] if address[0] else 'http'
     scheme += '://'
     netloc = address[1]
-    path = address[2]
-    url = scheme + netloc + path
+    url = scheme + netloc
     return url
