@@ -3,7 +3,7 @@ from datetime import datetime
 from page_analyzer.database.db import get_db
 
 
-def get_urls_list():
+def get_list():
     factory = psycopg2.extras.NamedTupleCursor
     with get_db().cursor(cursor_factory=factory) as cur:
         cur.execute("SELECT \
@@ -20,7 +20,7 @@ def get_urls_list():
         return cur.fetchall()
 
 
-def get_id_url_by_name(url_name):
+def get_id(url_name):
     with get_db() as conn:
         with conn.cursor() as cur:
             cur.execute("SELECT id FROM urls WHERE name = (%s)", (url_name,))
@@ -28,14 +28,14 @@ def get_id_url_by_name(url_name):
             return str(*records) if records else None
 
 
-def get_name_url_by_id(id):
+def get_name(id):
     factory = psycopg2.extras.NamedTupleCursor
     with get_db().cursor(cursor_factory=factory) as cur:
         cur.execute("SELECT name FROM urls WHERE id = (%s)", (id,))
         return cur.fetchone()
 
 
-def get_url_info_by_id(id):
+def get_info(id):
     factory = psycopg2.extras.NamedTupleCursor
     with get_db().cursor(cursor_factory=factory) as cur:
         cur.execute("SELECT id, name, created_at FROM urls \
@@ -43,7 +43,7 @@ def get_url_info_by_id(id):
         return cur.fetchone()
 
 
-def add_new_url(name):
+def add(name):
     with get_db() as conn:
         with conn.cursor() as cur:
             cur.execute("INSERT INTO urls (name, created_at) \

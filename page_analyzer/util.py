@@ -10,8 +10,8 @@ def is_valid_url(link):
     return True
 
 
-def normalize_url(user_data):
-    address = urlparse(user_data)
+def normalize_url(data):
+    address = urlparse(data)
     scheme = address[0] if address[0] else 'http'
     scheme += '://'
     netloc = address[1]

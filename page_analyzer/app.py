@@ -5,7 +5,7 @@ from flask import (Flask, render_template, request,
 
 from page_analyzer import util
 from page_analyzer.database import urls, checks
-from page_analyzer.html import get_page_contents
+from page_analyzer.html import get_page_data
 
 
 MAX_LENGTH = 255
@@ -22,7 +22,7 @@ def start():
 
 @app.route('/urls')
 def sites():
-    records = urls.get_urls_list()
+    records = urls.get_list()
     return render_template('urls.html', rows=records), 200
 
 
@@ -36,12 +36,12 @@ def add():
 
     valid_url = util.normalize_url(user_url)
 
-    id = urls.get_id_url_by_name(valid_url)
+    id = urls.get_id(valid_url)
     if id:
         flash('Страница уже существует', 'info')
         return redirect(url_for('url', id=id), code=302)
 
-    id = urls.add_new_url(valid_url)
+    id = urls.add(valid_url)
     flash('Страница успешно добавлена', 'success')
 
     return redirect(url_for('url', id=id), code=302)
@@ -49,12 +49,12 @@ def add():
 
 @app.route('/urls/<int:id>')
 def url(id):
-    if not urls.get_name_url_by_id(id):
+    if not urls.get_name(id):
         flash('Такой страницы не существует', 'danger')
         return render_template('404.html')
 
-    record = urls.get_url_info_by_id(id)
-    check_list = checks.get_checks_list_by_id(id)
+    record = urls.get_info(id)
+    check_list = checks.get_list(id)
     return render_template('url_id.html',
                            record=record,
                            checks=check_list)
@@ -62,7 +62,7 @@ def url(id):
 
 @app.post('/urls/<int:id>/checks')
 def check(id):
-    url_name = urls.get_name_url_by_id(id)
+    url_name = urls.get_name(id)
     headers = requests.utils.default_headers()
     headers.update({'User-Agent': 'My User Agent 1.0'})
 
@@ -74,8 +74,8 @@ def check(id):
         return redirect(url_for('url', id=id), code=302)
 
     status_code = response.status_code
-    tags = get_page_contents(response.text)
-    checks.add_new_check(id, status_code, tags)
+    tags = get_page_data(response.text)
+    checks.add(id, status_code, tags)
 
     flash('Страница успешно проверена', 'success')
     return redirect(url_for('url', id=id), code=302)

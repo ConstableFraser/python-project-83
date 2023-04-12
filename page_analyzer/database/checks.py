@@ -3,7 +3,7 @@ from datetime import datetime
 from page_analyzer.database.db import get_db
 
 
-def get_checks_list_by_id(id):
+def get_list(id):
     factory = psycopg2.extras.NamedTupleCursor
     with get_db().cursor(cursor_factory=factory) as cur:
         cur.execute("SELECT id, status_code, h1, title, \
@@ -13,7 +13,7 @@ def get_checks_list_by_id(id):
         return cur.fetchall()
 
 
-def add_new_check(id, status_code, tags):
+def add(id, status_code, tags):
     with get_db() as conn:
         with conn.cursor() as cur:
             cur.execute("INSERT INTO url_checks \

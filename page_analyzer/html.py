@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 
 
-def get_page_contents(content):
+def get_page_data(content):
     soup = BeautifulSoup(content, 'html.parser')
     description = ''
 
