@@ -14,13 +14,13 @@
 3. push the "Запустить проверку" (launch checking)
 4. see result of checking at the table below
 
-![Guide](res/Page_analyzer.jpg)
+![Guide](screens/Page_analyzer.jpg)
 
 ## demo version:
 https://page-analyzer-service.onrender.com/
 
 
-**technical information**
+##technical information##
 python, poetry, flask, gunicorn, jinja2, beautifulsoup, psycopg2, postgresql, bootstrap
 
 

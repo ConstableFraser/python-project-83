@@ -9,8 +9,3 @@ def get_db():
     DATABASE_URL = os.getenv('DATABASE_URL')
 
     return psycopg2.connect(DATABASE_URL)
-
-
-def get_cursor_tuple():
-    factory = psycopg2.extras.NamedTupleCursor
-    return get_db().cursor(cursor_factory=factory)
